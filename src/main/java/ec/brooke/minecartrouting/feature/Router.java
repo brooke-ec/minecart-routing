@@ -3,6 +3,7 @@ package ec.brooke.minecartrouting.feature;
 import ec.brooke.minecartrouting.MinecartRouting;
 import ec.brooke.minecartrouting.Utils;
 import ec.brooke.minecartrouting.store.DyeFilter;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -24,7 +25,8 @@ public class Router implements Listener {
         DyeFilter filter = MinecartRouting.FILTERS.get(block);
         if (filter == null) return;
 
-        boolean passes = test(Utils.getNearbyEntities(Minecart.class, block.getLocation(), 0.2), filter);
+        Location location = block.getLocation().add(0.5, 0.5, 0.5);
+        boolean passes = test(Utils.getNearbyEntities(Minecart.class, location, 0.2), filter);
         event.setNewCurrent(passes ? 15 : 0);
     }
 
