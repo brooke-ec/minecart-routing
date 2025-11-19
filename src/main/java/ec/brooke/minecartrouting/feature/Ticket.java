@@ -1,7 +1,7 @@
 package ec.brooke.minecartrouting.feature;
 
-import ec.brooke.minecartrouting.Conversions;
 import ec.brooke.minecartrouting.MinecartRouting;
+import ec.brooke.minecartrouting.Utils;
 import ec.brooke.minecartrouting.store.DyeColorType;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
@@ -33,7 +33,7 @@ public class Ticket {
     }
 
     public static void setup() {
-        for (Map.Entry<Material, DyeColor> entry : Conversions.MATERIAL_TO_DYE.entrySet()) {
+        for (Map.Entry<Material, DyeColor> entry : Utils.MATERIAL_TO_DYE.entrySet()) {
             String name = entry.getValue().name().toLowerCase();
             NamespacedKey key = new NamespacedKey(MinecartRouting.INSTANCE, RECIPE_KEY_TEMPLATE.formatted(name));
 

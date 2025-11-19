@@ -1,16 +1,19 @@
 package ec.brooke.minecartrouting;
 
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.data.Rail;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.Map;
+import java.util.*;
 
-public class Conversions {
+public class Utils {
 
     public static final Map<Material, DyeColor> MATERIAL_TO_DYE = Map.ofEntries(
             Map.entry(Material.WHITE_DYE, DyeColor.WHITE),
@@ -91,5 +94,14 @@ public class Conversions {
                 new Vector3f(0.25f, 0.05f, 0.25f),
                 new Quaternionf()
         );
+    }
+
+    public static <T extends Entity> Collection<T> getNearbyEntities(Class<T> clazz, Location location, double radius) {
+        World world = Objects.requireNonNull(location.getWorld());
+        List<T> nearby = new ArrayList<>();
+
+        for (Entity entity : world.getNearbyEntities(location, radius, radius, radius))
+            if (clazz.isInstance(entity)) nearby.add(clazz.cast(entity));
+        return nearby;
     }
 }

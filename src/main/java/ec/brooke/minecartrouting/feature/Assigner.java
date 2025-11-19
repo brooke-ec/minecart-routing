@@ -1,12 +1,11 @@
 package ec.brooke.minecartrouting.feature;
 
-import ec.brooke.minecartrouting.Conversions;
 import ec.brooke.minecartrouting.MinecartRouting;
+import ec.brooke.minecartrouting.Utils;
 import ec.brooke.minecartrouting.store.DyeFilter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Rail;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,8 +45,8 @@ public class Assigner implements Listener {
                     update(block, current.invert());
                     event.setCancelled(true);
                 }
-            } else if (Conversions.MATERIAL_TO_DYE.containsKey(item.getType())) {
-                DyeColor dye = Conversions.MATERIAL_TO_DYE.get(item.getType());
+            } else if (Utils.MATERIAL_TO_DYE.containsKey(item.getType())) {
+                DyeColor dye = Utils.MATERIAL_TO_DYE.get(item.getType());
                 if (current != null && current.color == dye) return;
 
                 world.playSound(location, Sound.ENTITY_ITEM_FRAME_ADD_ITEM, 1, 1);
@@ -76,8 +75,8 @@ public class Assigner implements Listener {
         World world = block.getWorld();
 
         ItemDisplay existing = null;
-        for (Entity entity : world.getNearbyEntities(location, 1, 1, 1))
-            if (entity instanceof ItemDisplay display && display.getScoreboardTags().contains(DISPLAY_TAG)) {
+        for (ItemDisplay display : Utils.getNearbyEntities(ItemDisplay.class, location, 1))
+            if (display.getScoreboardTags().contains(DISPLAY_TAG)) {
                 existing = display;
                 break;
             }
@@ -87,12 +86,12 @@ public class Assigner implements Listener {
                 display.addScoreboardTag(DISPLAY_TAG);
                 display.setItemStack(
                     filter.whitelist
-                    ? Conversions.DYE_TO_CONCRETE.get(filter.color)
-                    : Conversions.DYE_TO_STAINED_GLASS.get(filter.color)
+                    ? Utils.DYE_TO_CONCRETE.get(filter.color)
+                    : Utils.DYE_TO_STAINED_GLASS.get(filter.color)
                 );
 
                 Rail.Shape shape = ((Rail) block.getBlockData()).getShape();
-                display.setTransformation(Conversions.shapeTransformation(shape));
+                display.setTransformation(Utils.shapeTransformation(shape));
             };
 
             if (existing == null) world.spawn(location, ItemDisplay.class, setup);

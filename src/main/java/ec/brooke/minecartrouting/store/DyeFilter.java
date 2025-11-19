@@ -19,6 +19,10 @@ public class DyeFilter {
         return new DyeFilter(color, !whitelist);
     }
 
+    public boolean test(DyeColor color) {
+        return whitelist == (this.color == color);
+    }
+
     public static class DyeFilterType implements PersistentDataType<String, DyeFilter> {
 
         public static final DyeFilterType INSTANCE = new DyeFilterType();

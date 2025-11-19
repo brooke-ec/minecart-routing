@@ -1,6 +1,7 @@
 package ec.brooke.minecartrouting;
 
 import ec.brooke.minecartrouting.feature.Assigner;
+import ec.brooke.minecartrouting.feature.Router;
 import ec.brooke.minecartrouting.feature.Ticket;
 import ec.brooke.minecartrouting.store.ChunkBlockLibrary;
 import ec.brooke.minecartrouting.store.DyeFilter;
@@ -22,6 +23,7 @@ public final class MinecartRouting extends JavaPlugin {
 
         PluginManager manager = getServer().getPluginManager();
         manager.registerEvents(new Assigner(), this);
+        manager.registerEvents(new Router(), this);
         Ticket.setup();
     }
 }
