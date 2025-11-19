@@ -1,4 +1,4 @@
-package ec.brooke.minecartrouting.feat;
+package ec.brooke.minecartrouting.feature;
 
 import ec.brooke.minecartrouting.Maps;
 import ec.brooke.minecartrouting.MinecartRouting;
