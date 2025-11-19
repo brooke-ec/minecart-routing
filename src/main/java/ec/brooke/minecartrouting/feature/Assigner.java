@@ -1,6 +1,6 @@
 package ec.brooke.minecartrouting.feature;
 
-import ec.brooke.minecartrouting.Maps;
+import ec.brooke.minecartrouting.Conversions;
 import ec.brooke.minecartrouting.MinecartRouting;
 import ec.brooke.minecartrouting.store.DyeFilter;
 import org.bukkit.*;
@@ -16,9 +16,6 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Transformation;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.function.Consumer;
 
@@ -49,8 +46,8 @@ public class Assigner implements Listener {
                     update(block, current.invert());
                     event.setCancelled(true);
                 }
-            } else if (Maps.MATERIAL_TO_DYE.containsKey(item.getType())) {
-                DyeColor dye = Maps.MATERIAL_TO_DYE.get(item.getType());
+            } else if (Conversions.MATERIAL_TO_DYE.containsKey(item.getType())) {
+                DyeColor dye = Conversions.MATERIAL_TO_DYE.get(item.getType());
                 if (current != null && current.color == dye) return;
 
                 world.playSound(location, Sound.ENTITY_ITEM_FRAME_ADD_ITEM, 1, 1);
@@ -67,12 +64,8 @@ public class Assigner implements Listener {
     @EventHandler
     public void onBlockPhysics(BlockPhysicsEvent event) {
         Block block = event.getBlock();
-
-        if (
-            event.getSourceBlock() == block
-            && block.getType() != Material.DETECTOR_RAIL
-            && !MinecartRouting.FILTERS.containsKey(block)
-        ) update(block, null);
+        DyeFilter filter = MinecartRouting.FILTERS.get(block);
+        if (filter != null) update(block, block.getType() == Material.DETECTOR_RAIL ? filter : null);
     }
 
     private void update(Block block, DyeFilter filter) {
@@ -93,12 +86,13 @@ public class Assigner implements Listener {
             Consumer<ItemDisplay> setup = display -> {
                 display.addScoreboardTag(DISPLAY_TAG);
                 display.setItemStack(
-                        filter.whitelist
-                        ? Maps.DYE_TO_CONCRETE.get(filter.color)
-                        : Maps.DYE_TO_STAINED_GLASS.get(filter.color)
+                    filter.whitelist
+                    ? Conversions.DYE_TO_CONCRETE.get(filter.color)
+                    : Conversions.DYE_TO_STAINED_GLASS.get(filter.color)
                 );
 
-                display.setTransformation(transform(block));
+                Rail.Shape shape = ((Rail) block.getBlockData()).getShape();
+                display.setTransformation(Conversions.shapeTransformation(shape));
             };
 
             if (existing == null) world.spawn(location, ItemDisplay.class, setup);
@@ -106,19 +100,5 @@ public class Assigner implements Listener {
         } else if (existing != null) {
             existing.remove();
         }
-    }
-
-    // todo: adjust based on rail shape
-    private Transformation transform(Block block) {
-        Rail.Shape shape = ((Rail) block.getBlockData()).getShape();
-
-        Transformation transformation = new Transformation(
-                new Vector3f(0.5f, 0.075f, 0.5f),
-                new Quaternionf(),
-                new Vector3f(0.25f, 0.05f, 0.25f),
-                new Quaternionf()
-        );
-
-        return transformation;
     }
 }
