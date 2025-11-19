@@ -36,7 +36,7 @@ public class ChunkBlockLibrary<T> implements Map<Block, T> {
 
     @Override
     public boolean containsKey(Object key) {
-        if (!(key instanceof Block block)) return false;
+        if (!(key instanceof Block block) || !hasContainer(block)) return false;
         PersistentDataContainer pdc = getContainer(block);
         return pdc.has(toKey(block.getLocation()), type);
     }
@@ -49,7 +49,7 @@ public class ChunkBlockLibrary<T> implements Map<Block, T> {
     @Override
     @Nullable
     public T get(Object key) {
-        if (!(key instanceof Block block)) return null;
+        if (!(key instanceof Block block) || !hasContainer(block)) return null;
         PersistentDataContainer pdc = getContainer(block);
         return pdc.get(toKey(block.getLocation()), type);
     }
@@ -65,10 +65,13 @@ public class ChunkBlockLibrary<T> implements Map<Block, T> {
 
     @Override
     public T remove(Object key) {
-        if (!(key instanceof Block block)) return null;
+        if (!(key instanceof Block block) || !hasContainer(block)) return null;
         PersistentDataContainer pdc = getContainer(block);
+
         T old = pdc.get(toKey(block.getLocation()), type);
         pdc.remove(toKey(block.getLocation()));
+
+        if (pdc.isEmpty()) removeContainer(block);
         return old;
     }
 
@@ -100,6 +103,16 @@ public class ChunkBlockLibrary<T> implements Map<Block, T> {
     @Override
     public Set<Entry<Block, T>> entrySet() {
         throw new UnsupportedOperationException();
+    }
+
+    private void removeContainer(Block block) {
+        PersistentDataContainer pdc = block.getChunk().getPersistentDataContainer();
+        pdc.remove(key);
+    }
+
+    private boolean hasContainer(Block block) {
+        PersistentDataContainer pdc = block.getChunk().getPersistentDataContainer();
+        return pdc.has(key, PersistentDataType.TAG_CONTAINER);
     }
 
     private PersistentDataContainer getContainer(Block block) {
